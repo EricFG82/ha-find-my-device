@@ -1,0 +1,6 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Gemini AI
+.gemini/settings.json

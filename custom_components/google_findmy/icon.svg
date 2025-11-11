@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Background circle with Google colors gradient -->
+  <defs>
+    <linearGradient id="googleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4285F4;stop-opacity:1" />
+      <stop offset="33%" style="stop-color:#34A853;stop-opacity:1" />
+      <stop offset="66%" style="stop-color:#FBBC04;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EA4335;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Shadow -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="120" fill="url(#googleGradient)" opacity="0.15"/>
+  
+  <!-- Main location pin icon -->
+  <g filter="url(#shadow)">
+    <!-- Pin body -->
+    <path d="M 128 40 
+             C 100 40, 78 62, 78 90
+             C 78 110, 90 125, 128 180
+             C 166 125, 178 110, 178 90
+             C 178 62, 156 40, 128 40 Z" 
+          fill="#4285F4" 
+          stroke="#1967D2" 
+          stroke-width="3"/>
+    
+    <!-- Inner circle (Google "G" background) -->
+    <circle cx="128" cy="88" r="28" fill="white"/>
+    
+    <!-- Google "G" letter simplified -->
+    <path d="M 128 70
+             C 138 70, 146 78, 146 88
+             C 146 98, 138 106, 128 106
+             C 118 106, 110 98, 110 88
+             C 110 78, 118 70, 128 70
+             M 128 74
+             C 120 74, 114 80, 114 88
+             C 114 96, 120 102, 128 102
+             C 136 102, 142 96, 142 88
+             L 142 88
+             L 135 88
+             L 135 92
+             L 138 92
+             C 137 95, 133 98, 128 98
+             C 122 98, 118 94, 118 88
+             C 118 82, 122 78, 128 78
+             C 131 78, 134 79, 136 81
+             L 139 78
+             C 136 75, 132 74, 128 74 Z"
+          fill="#4285F4"/>
+  </g>
+  
+  <!-- Radar/signal waves (indicating "Find My" functionality) -->
+  <g opacity="0.6">
+    <!-- Outer wave -->
+    <circle cx="128" cy="88" r="45" 
+            fill="none" 
+            stroke="#34A853" 
+            stroke-width="2" 
+            stroke-dasharray="5,5"
+            opacity="0.5">
+      <animate attributeName="r" 
+               from="35" 
+               to="50" 
+               dur="2s" 
+               repeatCount="indefinite"/>
+      <animate attributeName="opacity" 
+               from="0.5" 
+               to="0" 
+               dur="2s" 
+               repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Middle wave -->
+    <circle cx="128" cy="88" r="40" 
+            fill="none" 
+            stroke="#34A853" 
+            stroke-width="2" 
+            stroke-dasharray="5,5"
+            opacity="0.7">
+      <animate attributeName="r" 
+               from="35" 
+               to="50" 
+               dur="2s" 
+               begin="0.7s"
+               repeatCount="indefinite"/>
+      <animate attributeName="opacity" 
+               from="0.7" 
+               to="0" 
+               dur="2s" 
+               begin="0.7s"
+               repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Inner wave -->
+    <circle cx="128" cy="88" r="35" 
+            fill="none" 
+            stroke="#34A853" 
+            stroke-width="2" 
+            stroke-dasharray="5,5"
+            opacity="0.9">
+      <animate attributeName="r" 
+               from="35" 
+               to="50" 
+               dur="2s" 
+               begin="1.4s"
+               repeatCount="indefinite"/>
+      <animate attributeName="opacity" 
+               from="0.9" 
+               to="0" 
+               dur="2s" 
+               begin="1.4s"
+               repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Small device icons around the pin (representing tracked devices) -->
+  <g opacity="0.7">
+    <!-- Phone icon (left) -->
+    <rect x="50" y="140" width="20" height="30" rx="3" 
+          fill="#5F6368" stroke="#202124" stroke-width="1.5"/>
+    <rect x="52" y="143" width="16" height="20" 
+          fill="#E8EAED"/>
+    <circle cx="60" cy="167" r="2" fill="#5F6368"/>
+    
+    <!-- Tablet icon (right) -->
+    <rect x="186" y="135" width="28" height="38" rx="3" 
+          fill="#5F6368" stroke="#202124" stroke-width="1.5"/>
+    <rect x="189" y="138" width="22" height="28" 
+          fill="#E8EAED"/>
+    <circle cx="200" cy="169" r="2" fill="#5F6368"/>
+    
+    <!-- Tracker/Tag icon (bottom) -->
+    <circle cx="128" cy="210" r="12" 
+            fill="#5F6368" stroke="#202124" stroke-width="1.5"/>
+    <circle cx="128" cy="210" r="8" 
+            fill="#E8EAED"/>
+    <circle cx="128" cy="210" r="4" 
+            fill="#4285F4"/>
+  </g>
+</svg>
+

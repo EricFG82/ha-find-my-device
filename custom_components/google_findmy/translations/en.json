@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Google Find My Device",
+        "description": "Set up the Google Find My Device integration. Make sure the REST API service is running and accessible.",
+        "data": {
+          "name": "Name",
+          "api_url": "API URL"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the API. Please check the URL and ensure the service is running.",
+      "unknown": "Unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This API URL is already configured."
+    }
+  }
+}
+

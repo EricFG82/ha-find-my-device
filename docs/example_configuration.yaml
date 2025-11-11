@@ -1,0 +1,285 @@
+# Example Home Assistant Configuration
+# This file shows example automations, scripts, and dashboard cards
+# for the Google Find My Device integration
+
+# Note: The integration itself is configured via UI (Settings > Devices & Services)
+# This file contains examples of how to USE the integration in your automations
+
+# ============================================================================
+# AUTOMATIONS
+# ============================================================================
+
+automation:
+  # Low battery alert
+  - alias: "Google Find My - Low Battery Alert"
+    description: "Alert when any tracked device battery is low"
+    trigger:
+      - platform: numeric_state
+        entity_id:
+          - sensor.my_tracker_battery
+          - sensor.my_phone_battery
+        below: 20
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "Low Battery Alert"
+          message: >
+            {{ trigger.to_state.attributes.friendly_name }} 
+            battery is at {{ states(trigger.entity_id) }}%
+          data:
+            priority: high
+            tag: low_battery
+
+  # Device arrived home
+  - alias: "Google Find My - Device Arrived Home"
+    description: "Notify when a tracked device arrives home"
+    trigger:
+      - platform: zone
+        entity_id:
+          - device_tracker.my_tracker
+        zone: zone.home
+        event: enter
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "Device Home"
+          message: "{{ trigger.to_state.attributes.friendly_name }} has arrived home"
+
+  # Device left home
+  - alias: "Google Find My - Device Left Home"
+    description: "Notify when a tracked device leaves home"
+    trigger:
+      - platform: zone
+        entity_id:
+          - device_tracker.my_tracker
+        zone: zone.home
+        event: leave
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "Device Left"
+          message: "{{ trigger.to_state.attributes.friendly_name }} has left home"
+
+  # Device not seen for a while
+  - alias: "Google Find My - Device Not Seen Alert"
+    description: "Alert if device hasn't been seen for 24 hours"
+    trigger:
+      - platform: template
+        value_template: >
+          {{ (now() - states.sensor.my_tracker_last_seen.last_changed).total_seconds() > 86400 }}
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "Device Not Seen"
+          message: >
+            {{ trigger.entity_id.split('.')[1].replace('_last_seen', '').replace('_', ' ').title() }}
+            hasn't been seen for over 24 hours
+
+  # Critical battery level
+  - alias: "Google Find My - Critical Battery"
+    description: "Urgent alert when battery is critically low"
+    trigger:
+      - platform: numeric_state
+        entity_id:
+          - sensor.my_tracker_battery
+        below: 10
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "⚠️ Critical Battery"
+          message: >
+            {{ trigger.to_state.attributes.friendly_name }} 
+            battery is critically low at {{ states(trigger.entity_id) }}%!
+          data:
+            priority: high
+            tag: critical_battery
+            color: red
+
+# ============================================================================
+# SCRIPTS
+# ============================================================================
+
+script:
+  # Get all device locations
+  get_device_locations:
+    alias: "Get All Device Locations"
+    description: "Log the current location of all tracked devices"
+    sequence:
+      - service: logbook.log
+        data:
+          name: "Device Locations"
+          message: >
+            {% for state in states.device_tracker %}
+              {% if 'google_findmy' in state.entity_id %}
+                {{ state.attributes.friendly_name }}: 
+                {{ state.attributes.latitude }}, {{ state.attributes.longitude }}
+                (Accuracy: {{ state.attributes.accuracy }}m)
+              {% endif %}
+            {% endfor %}
+
+  # Check device battery levels
+  check_battery_levels:
+    alias: "Check All Battery Levels"
+    description: "Send notification with all device battery levels"
+    sequence:
+      - service: notify.mobile_app
+        data:
+          title: "Device Battery Levels"
+          message: >
+            {% for state in states.sensor %}
+              {% if state.entity_id.endswith('_battery') and 'google_findmy' in state.entity_id %}
+                {{ state.attributes.friendly_name }}: {{ state.state }}%
+              {% endif %}
+            {% endfor %}
+
+# ============================================================================
+# TEMPLATE SENSORS (Optional - for additional functionality)
+# ============================================================================
+
+template:
+  - sensor:
+      # Distance from home
+      - name: "My Tracker Distance from Home"
+        unique_id: my_tracker_distance_from_home
+        unit_of_measurement: "km"
+        state: >
+          {% set tracker = states.device_tracker.my_tracker %}
+          {% if tracker and tracker.attributes.latitude and tracker.attributes.longitude %}
+            {{ distance(tracker.entity_id, zone.home) | round(2) }}
+          {% else %}
+            unavailable
+          {% endif %}
+        icon: mdi:map-marker-distance
+
+      # Battery status text
+      - name: "My Tracker Battery Status"
+        unique_id: my_tracker_battery_status
+        state: >
+          {% set battery = states('sensor.my_tracker_battery') | int(0) %}
+          {% if battery > 80 %}
+            Excellent
+          {% elif battery > 50 %}
+            Good
+          {% elif battery > 20 %}
+            Low
+          {% elif battery > 10 %}
+            Very Low
+          {% else %}
+            Critical
+          {% endif %}
+        icon: >
+          {% set battery = states('sensor.my_tracker_battery') | int(0) %}
+          {% if battery > 80 %}
+            mdi:battery
+          {% elif battery > 50 %}
+            mdi:battery-60
+          {% elif battery > 20 %}
+            mdi:battery-30
+          {% elif battery > 10 %}
+            mdi:battery-10
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+  - binary_sensor:
+      # Is device home
+      - name: "My Tracker Is Home"
+        unique_id: my_tracker_is_home
+        state: >
+          {{ is_state('device_tracker.my_tracker', 'home') }}
+        device_class: presence
+        icon: mdi:home
+
+# ============================================================================
+# LOVELACE DASHBOARD EXAMPLES
+# ============================================================================
+
+# Copy these to your Lovelace dashboard configuration
+
+# Example 1: Map Card with all devices
+# type: map
+# entities:
+#   - device_tracker.my_tracker
+#   - device_tracker.my_phone
+# default_zoom: 15
+# hours_to_show: 24
+
+# Example 2: Device Status Card
+# type: entities
+# title: Device Status
+# entities:
+#   - entity: device_tracker.my_tracker
+#     secondary_info: last-changed
+#   - entity: sensor.my_tracker_battery
+#     name: Battery
+#   - entity: sensor.my_tracker_last_seen
+#     name: Last Seen
+#   - type: divider
+#   - entity: device_tracker.my_phone
+#     secondary_info: last-changed
+#   - entity: sensor.my_phone_battery
+#     name: Battery
+#   - entity: sensor.my_phone_last_seen
+#     name: Last Seen
+
+# Example 3: Battery Levels Glance Card
+# type: glance
+# title: Device Batteries
+# entities:
+#   - entity: sensor.my_tracker_battery
+#     name: Tracker
+#   - entity: sensor.my_phone_battery
+#     name: Phone
+# columns: 2
+
+# Example 4: Detailed Device Card
+# type: vertical-stack
+# cards:
+#   - type: entity
+#     entity: device_tracker.my_tracker
+#     name: My Tracker
+#     icon: mdi:bluetooth-connect
+#   - type: map
+#     entities:
+#       - device_tracker.my_tracker
+#     aspect_ratio: "16:9"
+#     default_zoom: 15
+#   - type: entities
+#     entities:
+#       - entity: sensor.my_tracker_battery
+#         name: Battery Level
+#       - entity: sensor.my_tracker_last_seen
+#         name: Last Seen
+#       - type: attribute
+#         entity: device_tracker.my_tracker
+#         attribute: accuracy
+#         name: Location Accuracy
+#       - type: attribute
+#         entity: device_tracker.my_tracker
+#         attribute: device_type
+#         name: Device Type
+
+# Example 5: Conditional Card (show only when battery is low)
+# type: conditional
+# conditions:
+#   - entity: sensor.my_tracker_battery
+#     state_not: unavailable
+#   - entity: sensor.my_tracker_battery
+#     state_below: 20
+# card:
+#   type: markdown
+#   content: >
+#     ⚠️ **Low Battery Alert**
+#     
+#     {{ state_attr('device_tracker.my_tracker', 'friendly_name') }}
+#     battery is at {{ states('sensor.my_tracker_battery') }}%
+#   title: Battery Warning
+
+# Example 6: History Graph
+# type: history-graph
+# title: Battery History
+# entities:
+#   - sensor.my_tracker_battery
+#   - sensor.my_phone_battery
+# hours_to_show: 24
+
