@@ -11,7 +11,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -37,22 +37,41 @@ async def async_setup_entry(
 ) -> None:
     """Set up Google Find My Device sensors."""
     coordinator: GoogleFindMyDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    
-    entities = []
-    
-    for device_id, device_data in coordinator.data.items():
-        # Battery sensor
-        if device_data.get("battery_level") is not None:
-            entities.append(
-                GoogleFindMyBatterySensor(coordinator, device_id, device_data)
-            )
-        
-        # Last seen sensor
-        entities.append(
-            GoogleFindMyLastSeenSensor(coordinator, device_id, device_data)
-        )
-    
-    async_add_entities(entities)
+
+    known_last_seen_ids: set[str] = set()
+    known_battery_ids: set[str] = set()
+
+    @callback
+    def _async_add_new_sensors() -> None:
+        """Add sensors for devices new to the coordinator, or that just gained battery data.
+
+        Entities are otherwise only created once at setup time, so a device added to
+        the Google account later - or one whose battery data wasn't available yet on
+        the first refresh (e.g. right after a restart of the REST API) - would never
+        get a sensor without this listener.
+        """
+        new_entities = []
+        for device_id, device_data in coordinator.data.items():
+            if device_id not in known_last_seen_ids:
+                known_last_seen_ids.add(device_id)
+                new_entities.append(
+                    GoogleFindMyLastSeenSensor(coordinator, device_id, device_data)
+                )
+
+            if (
+                device_id not in known_battery_ids
+                and device_data.get("battery_level") is not None
+            ):
+                known_battery_ids.add(device_id)
+                new_entities.append(
+                    GoogleFindMyBatterySensor(coordinator, device_id, device_data)
+                )
+
+        if new_entities:
+            async_add_entities(new_entities)
+
+    _async_add_new_sensors()
+    entry.async_on_unload(coordinator.async_add_listener(_async_add_new_sensors))
 
 
 class GoogleFindMyBaseSensor(CoordinatorEntity, SensorEntity):

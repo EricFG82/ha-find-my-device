@@ -14,6 +14,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -51,7 +52,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     # Fetch initial data
     await coordinator.async_config_entry_first_refresh()
-    
+
+    # Clean up devices from previous pairings. Re-pairing a tracker (e.g. after a
+    # battery change) makes Google issue a new device_id for the same physical
+    # device - Home Assistant doesn't prune devices on its own, so without this
+    # the old device_id lingers forever as a duplicate, unavailable device.
+    await _async_remove_stale_devices(hass, entry, coordinator)
+
     # Store coordinator
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator
@@ -71,6 +78,33 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
     
     return unload_ok
+
+
+async def _async_remove_stale_devices(
+    hass: HomeAssistant, entry: ConfigEntry, coordinator: "GoogleFindMyDataUpdateCoordinator"
+) -> None:
+    """Remove devices the API no longer reports.
+
+    Re-pairing a tracker (e.g. after a battery change) makes Google issue a new
+    device_id for the same physical device, so the old device_id simply stops
+    showing up in coordinator.data. Home Assistant never prunes devices on its
+    own, so we do it explicitly here, once, at setup/reload time.
+    """
+    device_registry = dr.async_get(hass)
+    current_device_ids = set(coordinator.data.keys())
+
+    for device in dr.async_entries_for_config_entry(device_registry, entry.entry_id):
+        device_id = next(
+            (identifier[1] for identifier in device.identifiers if identifier[0] == DOMAIN),
+            None,
+        )
+        if device_id is not None and device_id not in current_device_ids:
+            _LOGGER.info(
+                "Removing stale device %s (%s) - no longer reported by the API",
+                device.name,
+                device_id,
+            )
+            device_registry.async_remove_device(device.id)
 
 
 class GoogleFindMyAPIClient:

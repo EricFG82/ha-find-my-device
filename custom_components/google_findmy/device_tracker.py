@@ -7,7 +7,7 @@ from typing import Any
 from homeassistant.components.device_tracker import SourceType
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -39,17 +39,33 @@ async def async_setup_entry(
 ) -> None:
     """Set up Google Find My Device trackers."""
     coordinator: GoogleFindMyDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    
-    entities = []
-    
-    for device_id, device_data in coordinator.data.items():
-        # Only create tracker if device has location data
-        if device_data.get("location"):
-            entities.append(
-                GoogleFindMyDeviceTracker(coordinator, device_id, device_data)
-            )
-    
-    async_add_entities(entities)
+
+    known_device_ids: set[str] = set()
+
+    @callback
+    def _async_add_new_trackers() -> None:
+        """Add trackers for devices that have gained location data since the last check.
+
+        Devices only get a tracker once they have a location - a brand new device,
+        or one whose first location fetch hasn't completed yet (e.g. right after a
+        restart of the REST API), won't have one immediately. Without this listener
+        that device would never get a tracker at all, since entities are otherwise
+        only created once at setup time.
+        """
+        new_entities = []
+        for device_id, device_data in coordinator.data.items():
+            if device_id in known_device_ids:
+                continue
+            if device_data.get("location"):
+                known_device_ids.add(device_id)
+                new_entities.append(
+                    GoogleFindMyDeviceTracker(coordinator, device_id, device_data)
+                )
+        if new_entities:
+            async_add_entities(new_entities)
+
+    _async_add_new_trackers()
+    entry.async_on_unload(coordinator.async_add_listener(_async_add_new_trackers))
 
 
 class GoogleFindMyDeviceTracker(CoordinatorEntity, TrackerEntity):
