@@ -43,8 +43,8 @@ Expected output:
 
 1. Install the File Editor add-on if you haven't already
 2. Navigate to `/config/custom_components/`
-3. Create a new folder called `google_findmy`
-4. Copy all files from `homeassistant-integration/custom_components/google_findmy/` to this folder
+3. Create a new folder called `google_find_my_device`
+4. Copy all files from this repo's `custom_components/google_find_my_device/` to this folder
 
 **Option B: Using SSH or Terminal**
 
@@ -59,7 +59,7 @@ cd /config
 mkdir -p custom_components
 
 # Copy the integration (adjust path as needed)
-cp -r /path/to/homeassistant-integration/custom_components/google_findmy custom_components/
+cp -r /path/to/custom_components/google_find_my_device custom_components/
 ```
 
 **Option C: Using Samba/SMB Share**
@@ -67,7 +67,7 @@ cp -r /path/to/homeassistant-integration/custom_components/google_findmy custom_
 1. Connect to your Home Assistant via network share
 2. Navigate to the `config` folder
 3. Create `custom_components` folder if it doesn't exist
-4. Copy the `google_findmy` folder into `custom_components`
+4. Copy the `google_find_my_device` folder into `custom_components`
 
 ### 4. Restart Home Assistant (1 minute)
 
@@ -152,7 +152,7 @@ curl http://YOUR_API_HOST:8000/health
 
 **Fix:**
 
-1. Verify files are in `/config/custom_components/google_findmy/`
+1. Verify files are in `/config/custom_components/google_find_my_device/`
 2. Check file permissions
 3. Restart Home Assistant
 4. Clear browser cache (Ctrl+F5)
@@ -167,7 +167,7 @@ curl http://YOUR_API_HOST:8000/health
 curl http://YOUR_API_URL/health
 
 # Check integration logs in Home Assistant
-# Settings > System > Logs > Filter for "google_findmy"
+# Settings > System > Logs > Filter for "google_find_my_device"
 
 # Reload the integration
 # Settings > Devices & Services > Google Find My Device > ⋮ > Reload
@@ -193,7 +193,7 @@ If you encounter issues:
    - Home Assistant: Settings > System > Logs
 2. Review the detailed documentation:
    - [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) - **For REST API / authentication issues**
-   - [Home Assistant Integration README](homeassistant-integration/README.md)
+   - [README.md](README.md#-troubleshooting)
 3. Verify all prerequisites are met
 4. Check the troubleshooting sections in the documentation
 

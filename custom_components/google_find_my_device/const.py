@@ -3,7 +3,7 @@
 from homeassistant.const import Platform
 
 # Domain
-DOMAIN = "google_findmy"
+DOMAIN = "google_find_my_device"
 
 # Platforms
 PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER]

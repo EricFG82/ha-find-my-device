@@ -221,7 +221,7 @@ percentage for these trackers in the reverse-engineered protocol the API uses.
 ## Deployment Options
 
 ### Option 1: Manual copy into `custom_components/` (current)
-- Copy `homeassistant-integration/custom_components/google_findmy/` into
+- Copy this repo's `custom_components/google_find_my_device/` into
   Home Assistant's config directory, restart, add via the UI
 
 ### Option 2: HACS (planned)
@@ -267,7 +267,7 @@ percentage for these trackers in the reverse-engineered protocol the API uses.
 
 ## Troubleshooting
 
-See [homeassistant-integration/README.md](homeassistant-integration/README.md#troubleshooting)
+See [README.md](README.md#-troubleshooting)
 for integration-specific troubleshooting, or
 [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) for
 REST API / authentication issues.

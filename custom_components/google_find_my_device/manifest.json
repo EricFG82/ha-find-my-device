@@ -1,5 +1,5 @@
 {
-  "domain": "google_findmy",
+  "domain": "google_find_my_device",
   "name": "Google Find My Device",
   "codeowners": ["@EricFG82"],
   "config_flow": true,

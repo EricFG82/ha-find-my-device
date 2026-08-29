@@ -19,6 +19,8 @@ A custom Home Assistant integration for Google Find My Device tracking.
 - [🔧 Configuration](#-configuration)
 - [🏠 Home Assistant Entities](#-home-assistant-entities)
 - [💡 Usage Examples](#-usage-examples)
+- [🐛 Troubleshooting](#-troubleshooting)
+- [🗑️ Uninstallation](#️-uninstallation)
 - [📚 Documentation](#-documentation)
 - [🔒 Security Considerations](#-security-considerations)
 - [⚠️ Disclaimer](#️-disclaimer)
@@ -36,7 +38,9 @@ provide Google Find My Device tracking and monitoring in Home Assistant.
 ## ✨ Features
 
 - Device tracker entities showing device locations on the map
-- Battery level sensors for monitoring device power
+- Battery level sensors for monitoring device power *(currently inactive -
+  see note under [Home Assistant Entities](#-home-assistant-entities);
+  Google's network doesn't expose battery data for these trackers today)*
 - Last seen timestamp sensors
 - Automatic updates with configurable polling
 - Rich device attributes (type, model, accuracy, status)
@@ -60,18 +64,20 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 
 ### Step 2: Install the Home Assistant Integration
 
+**Not yet available via HACS** - install manually for now:
+
 1. **Copy the integration to Home Assistant**:
 
    ```bash
    # SSH into your Home Assistant instance or use the File Editor add-on
    cd /config
    mkdir -p custom_components
-   cp -r /path/to/homeassistant-integration/custom_components/google_findmy custom_components/
+   cp -r /path/to/custom_components/google_find_my_device custom_components/
    ```
 
 2. **Restart Home Assistant**:
 
-   - Go to Settings > System > Restart
+   - Go to Settings > System > Restart (or `ha core restart` over SSH)
 
 3. **Add the integration**:
 
@@ -90,23 +96,24 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 
 ```
 .
-├── homeassistant-integration/         # Home Assistant Integration
-│   ├── custom_components/
-│   │   └── google_findmy/
-│   │       ├── __init__.py            # Integration setup
-│   │       ├── config_flow.py         # UI configuration
-│   │       ├── const.py               # Constants
-│   │       ├── device_tracker.py      # Device tracker platform
-│   │       ├── sensor.py              # Sensor platform
-│   │       ├── manifest.json          # Integration manifest
-│   │       ├── strings.json           # UI strings
-│   │       └── translations/
-│   │           └── en.json
-│   └── README.md                      # Detailed integration documentation
-│
-├── ARCHITECTURE.md                    # Technical architecture
-├── QUICKSTART.md                      # Quick start guide
-└── README.md                          # This file
+├── custom_components/
+│   └── google_find_my_device/
+│       ├── __init__.py            # Integration setup
+│       ├── config_flow.py         # UI configuration
+│       ├── const.py               # Constants
+│       ├── device_tracker.py      # Device tracker platform
+│       ├── sensor.py              # Sensor platform
+│       ├── manifest.json          # Integration manifest
+│       ├── strings.json           # UI strings
+│       └── translations/
+│           └── en.json
+├── branding/                      # Icon source assets (for a future
+│                                   # home-assistant/brands PR - see its README)
+├── docs/
+│   └── example_configuration.yaml # Extra automation/card examples
+├── ARCHITECTURE.md                # Technical architecture
+├── QUICKSTART.md                  # Quick start guide
+└── README.md                      # This file
 ```
 
 ## 🔧 Configuration
@@ -114,24 +121,83 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 Configuration is done through the UI:
 
 - **API URL**: The URL where your [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) service is running
-- **Update Interval**: Default is 60 seconds (can be changed in code)
+- **Update Interval**: Default is 60 seconds; to change it, edit
+  `custom_components/google_find_my_device/const.py`:
+
+  ```python
+  DEFAULT_SCAN_INTERVAL = 120  # Change to desired seconds
+  ```
+
+  then restart Home Assistant.
+
+### Home Assistant and the API in separate Docker containers
+
+**Option 1: Same Docker network**
+
+```yaml
+# docker-compose.yml
+services:
+  homeassistant:
+    # ... your HA config
+    networks:
+      - findmy-network
+
+  google-find-my-device-rest-api:
+    # ... API config
+    networks:
+      - findmy-network
+
+networks:
+  findmy-network:
+    driver: bridge
+```
+
+Use API URL: `http://google-find-my-device-rest-api:8000`
+
+**Option 2: Host network**
+
+```yaml
+services:
+  homeassistant:
+    network_mode: host
+```
+
+Use API URL: `http://localhost:8000`
+
+**Remote API service** (different machine): use its IP address
+(`http://192.168.1.100:8000`), ensure port 8000 is reachable, and consider
+HTTPS behind a reverse proxy for anything beyond your local network.
 
 ## 🏠 Home Assistant Entities
 
-For each device, the following entities are created:
-
-| Entity Type    | Entity ID                        | Description         |
-| -------------- | -------------------------------- | ------------------- |
-| Device Tracker | `device_tracker.{device_name}`   | Device location     |
-| Sensor         | `sensor.{device_name}_battery`   | Battery level (%) - see note below |
-| Sensor         | `sensor.{device_name}_last_seen` | Last seen timestamp |
+Entities are created **dynamically, per device, as data becomes available** -
+not all at once when the integration is set up. A device tracker only
+appears once that device has a location; a battery sensor only appears once
+`battery_level` data exists for it. If a tracker doesn't have a location yet
+on the very first refresh (e.g. right after the REST API restarts), it'll
+still get its tracker as soon as the location shows up in a later update -
+it isn't stuck waiting for a reload.
 
 > **Battery level is currently not available for any device.** Google's Find My
 > Device network (as exposed by the underlying `GoogleFindMyTools` library) doesn't
 > expose a battery percentage for `SPOT_DEVICE` trackers (Fast Pair tags, etc.). The
 > `battery_level` field/sensor exist for when that data becomes available, but expect
-> it to stay `null` today. Entities are created dynamically as data becomes
-> available, not all at once at integration setup.
+> it to stay `null` today.
+
+Devices that stop being reported by the API (e.g. a tracker re-paired after a
+battery change gets issued a new ID by Google) are removed from Home
+Assistant's device registry automatically on integration setup/reload - you
+won't end up with duplicate/unavailable "ghost" devices after re-pairing
+something.
+
+| Entity Type    | Entity ID                        | Created                                   |
+| -------------- | --------------------------------- | ------------------------------------------ |
+| Device Tracker | `device_tracker.{device_name}`    | Once the device has a location             |
+| Sensor         | `sensor.{device_name}_battery`    | Once `battery_level` is available (never today, see note above) |
+| Sensor         | `sensor.{device_name}_last_seen`  | Immediately for every known device         |
+
+The device tracker's attributes include Device ID, Device Type, Model,
+Battery Level, Location Accuracy, Location Timestamp, and Status.
 
 ## 💡 Usage Examples
 
@@ -150,6 +216,23 @@ automation:
           message: "Tracker battery is low: {{ states('sensor.my_tracker_battery') }}%"
 ```
 
+### Automation: Device Arrived Home
+
+```yaml
+automation:
+  - alias: "Device Arrived Home"
+    trigger:
+      - platform: zone
+        entity_id: device_tracker.my_tracker
+        zone: zone.home
+        event: enter
+    action:
+      - service: notify.mobile_app
+        data:
+          title: "Device Home"
+          message: "Your tracker has arrived home"
+```
+
 ### Lovelace Card: Device Map
 
 ```yaml
@@ -159,6 +242,21 @@ entities:
   - device_tracker.my_phone
 default_zoom: 15
 ```
+
+### Lovelace Card: Device Status
+
+```yaml
+type: entities
+title: Device Status
+entities:
+  - entity: device_tracker.my_tracker
+    secondary_info: last-changed
+  - entity: sensor.my_tracker_battery
+  - entity: sensor.my_tracker_last_seen
+```
+
+More examples (glance cards, scripts, template/binary sensors) are in
+[`docs/example_configuration.yaml`](docs/example_configuration.yaml).
 
 ### Querying the REST API Directly
 
@@ -182,10 +280,59 @@ for device in devices:
 See [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) for the
 full endpoint reference.
 
+## 🐛 Troubleshooting
+
+### Integration Not Found
+
+Can't find "Google Find My Device" when adding the integration:
+
+1. Verify the files are in the correct location: `/config/custom_components/google_find_my_device/`
+2. Restart Home Assistant
+3. Clear browser cache (Ctrl+F5)
+
+### Cannot Connect to API
+
+"Failed to connect to the API" during setup:
+
+1. Verify the REST API service is running: `curl http://YOUR_API_HOST:8000/health`
+2. Check the API URL is correct (include `http://` or `https://`)
+3. Ensure Home Assistant can reach the API service (firewall, network settings)
+4. If using Docker, make sure both containers are on the same network or use host networking
+
+### No Entities Created
+
+Integration added successfully but no entities appear:
+
+1. Check the integration logs: Settings > System > Logs
+2. Verify the REST API service has devices: `curl http://YOUR_API_HOST:8000/api/v1/devices`
+3. Reload the integration: Settings > Devices & Services > Google Find My Device > ⋮ > Reload
+
+### Entities Unavailable
+
+1. Check if the REST API service is running
+2. Verify network connectivity between Home Assistant and the API
+3. Check the integration logs for errors
+4. Try reloading the integration
+
+### Location Not Updating
+
+1. Check if the device has recent location data in the API: `curl http://YOUR_API_HOST:8000/api/v1/devices/{device_id}`
+2. Verify the device is online and reporting location
+3. Check the update interval (default: 60 seconds)
+4. Ensure the device has location permissions enabled
+
+## 🗑️ Uninstallation
+
+1. Go to **Settings** > **Devices & Services**
+2. Find **Google Find My Device**
+3. Click the **⋮** menu → **Delete**
+4. Optionally, remove the integration files: `rm -rf /config/custom_components/google_find_my_device`
+5. Restart Home Assistant
+
 ## 📚 Documentation
 
 - [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) - REST API service (setup, authentication, endpoint reference)
-- [Home Assistant Integration Documentation](homeassistant-integration/README.md) - Detailed integration documentation
+- [ARCHITECTURE.md](ARCHITECTURE.md) - Technical architecture
 - [GoogleFindMyTools](https://github.com/leonboe1/GoogleFindMyTools) - Underlying library used by the REST API
 
 ## 🔒 Security Considerations
