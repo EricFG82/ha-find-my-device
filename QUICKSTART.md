@@ -5,9 +5,8 @@ Get up and running with Google Find My Device integration in Home Assistant in u
 ## Prerequisites Checklist
 
 - [ ] Google Account with Find My Device enabled
-- [ ] Docker and Docker Compose installed
+- [ ] The [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) REST API service running somewhere reachable from Home Assistant
 - [ ] Home Assistant running (version 2023.1+)
-- [ ] Chromium/Chrome browser (Chromium is included in Docker image)
 
 ## Step-by-Step Setup
 
@@ -15,73 +14,21 @@ Get up and running with Google Find My Device integration in Home Assistant in u
 
 ```bash
 git clone <repository-url>
-cd GoogleFindMyTools
+cd ha_google_find_my_device
 ```
 
 Or download and extract the ZIP file.
 
-### 2. Set Up the REST API Service (5 minutes)
+### 2. Get the REST API Running First (5 minutes)
 
-> 📖 **Need help with authentication?** See the detailed [Authentication Guide](AUTHENTICATION.md)
-
-```bash
-# Navigate to the REST API directory
-cd rest-api
-
-# Create directory for authentication data
-mkdir -p auth_data
-```
-
-**Authenticate with Google (Method 1 - Recommended):**
-
-> **Note**: GoogleFindMyTools is the Python library that provides authentication. We'll clone it **on your Mac** to run authentication with your system's Chrome browser.
+This integration is just the Home Assistant side - it needs the REST API
+service running somewhere it can reach over the network. Follow
+[google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)'s own
+Quick Start (Docker, authenticate via the in-browser VNC flow - no local
+Chrome needed) to get it up, then come back here. Once it's running:
 
 ```bash
-# Go back to project root
-cd ..
-
-# Clone GoogleFindMyTools if not already cloned
-if [ ! -d "GoogleFindMyTools" ]; then
-    git clone https://github.com/leonboe1/GoogleFindMyTools.git
-fi
-
-# Install Python dependencies (one-time)
-pip3 install -r GoogleFindMyTools/requirements.txt
-
-# Run authentication (Chrome will open)
-cd GoogleFindMyTools
-python3 main.py
-```
-
-**During authentication:**
-
-1. Press Enter when prompted
-2. Chrome browser will open automatically
-3. Log in to your Google Account
-4. Complete any 2FA if required
-5. Wait for success message
-
-**Copy authentication file:**
-
-```bash
-# Copy secrets to Docker volume
-cp Auth/secrets.json ../rest-api/auth_data/
-
-# Return to rest-api directory
-cd ../rest-api
-```
-
-**Build and start the service:**
-
-```bash
-# Build the Docker image
-docker compose build
-
-# Start the API service
-docker compose up -d
-
-# Verify it's running
-curl http://localhost:8000/health
+curl http://YOUR_API_HOST:8000/health
 ```
 
 Expected output:
@@ -90,18 +37,7 @@ Expected output:
 { "status": "healthy", "message": "Service is running normally" }
 ```
 
-### 3. Test the API (1 minute)
-
-```bash
-# List your devices
-curl http://localhost:8000/api/v1/devices
-
-# Open the interactive API documentation
-open http://localhost:8000/docs
-# Or visit: http://localhost:8000/docs in your browser
-```
-
-### 4. Install Home Assistant Integration (3 minutes)
+### 3. Install Home Assistant Integration (3 minutes)
 
 **Option A: Using Home Assistant File Editor Add-on**
 
@@ -133,12 +69,12 @@ cp -r /path/to/homeassistant-integration/custom_components/google_findmy custom_
 3. Create `custom_components` folder if it doesn't exist
 4. Copy the `google_findmy` folder into `custom_components`
 
-### 5. Restart Home Assistant (1 minute)
+### 4. Restart Home Assistant (1 minute)
 
 - Go to **Settings** > **System** > **Restart**
 - Wait for Home Assistant to restart (usually 1-2 minutes)
 
-### 6. Add the Integration (2 minutes)
+### 5. Add the Integration (2 minutes)
 
 1. Go to **Settings** > **Devices & Services**
 2. Click **+ ADD INTEGRATION** (bottom right)
@@ -152,16 +88,18 @@ cp -r /path/to/homeassistant-integration/custom_components/google_findmy custom_
      - If using Docker on same host: `http://host.docker.internal:8000` (Mac/Windows) or `http://172.17.0.1:8000` (Linux)
 6. Click **Submit**
 
-### 7. Verify Everything Works
+### 6. Verify Everything Works
 
 1. Go to **Settings** > **Devices & Services** > **Google Find My Device**
 2. You should see your devices listed
 3. Click on a device to see its entities:
-   - `device_tracker.{device_name}` - Location tracker
-   - `sensor.{device_name}_battery` - Battery level
+   - `device_tracker.{device_name}` - Location tracker (appears once the device has a location)
+   - `sensor.{device_name}_battery` - Battery level (**currently not created for any
+     device** - Google's Find My Device network doesn't expose battery percentage
+     for these trackers today)
    - `sensor.{device_name}_last_seen` - Last seen timestamp
 
-### 8. Add Devices to Your Dashboard
+### 7. Add Devices to Your Dashboard
 
 **Add to Map Card:**
 
@@ -184,40 +122,31 @@ cp -r /path/to/homeassistant-integration/custom_components/google_findmy custom_
 
 ## Verification Checklist
 
-- [ ] REST API service is running (`docker-compose ps` shows "Up")
-- [ ] Health check returns healthy (`curl http://localhost:8000/health`)
-- [ ] API returns devices (`curl http://localhost:8000/api/v1/devices`)
+- [ ] REST API service is running (`curl http://YOUR_API_HOST:8000/health`)
+- [ ] API returns devices (`curl http://YOUR_API_HOST:8000/api/v1/devices`)
 - [ ] Home Assistant shows the integration in Devices & Services
 - [ ] Device entities are created and available
 - [ ] Device location shows on the map
-- [ ] Battery and last seen sensors show data
+- [ ] Last seen sensor shows data (battery sensor won't - see note below)
 
 ## Common Issues and Quick Fixes
 
-> 📖 **For authentication issues**, see the comprehensive [Authentication Guide](AUTHENTICATION.md)
-
-### Issue: Authentication fails or Chrome doesn't open
-
-**Fix:**
-
-1. Make sure Chrome is installed
-2. Check that Python dependencies are installed: `pip3 install -r GoogleFindMyTools/requirements.txt`
-3. See [Authentication Guide](AUTHENTICATION.md) for detailed troubleshooting
+> 📖 **For REST API / authentication issues**, see
+> [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)'s
+> [AUTHENTICATION.md](https://github.com/EricFG82/google-find-my-device-rest-api/blob/main/AUTHENTICATION.md)
 
 ### Issue: "Cannot connect to API"
 
 **Fix:**
 
 ```bash
-# Check if API is running
-docker-compose ps
-
-# Check API logs
-docker-compose logs -f google-findmy-api
-
-# Restart API if needed
-docker-compose restart
+# Check if the API is reachable from Home Assistant
+curl http://YOUR_API_HOST:8000/health
 ```
+
+- Verify the API URL is correct (include `http://` or `https://`)
+- Check firewall/network settings between Home Assistant and the API host
+- Check the API service's own logs (see its repo's README)
 
 ### Issue: "Integration not found in Home Assistant"
 
@@ -227,16 +156,6 @@ docker-compose restart
 2. Check file permissions
 3. Restart Home Assistant
 4. Clear browser cache (Ctrl+F5)
-
-### Issue: "Your encryption data is locked on your device"
-
-**Fix:**
-
-1. Get an Android device
-2. Log in with your Google Account
-3. Go to Settings > Google > All Services > Find My Device
-4. Enable "Find your offline devices"
-5. If option not available, install Find My Device app from Play Store
 
 ### Issue: Entities show as "Unavailable"
 
@@ -270,11 +189,10 @@ See the main [README.md](README.md) for examples and advanced configuration.
 If you encounter issues:
 
 1. Check the logs:
-   - REST API: `docker-compose logs -f google-findmy-api`
+   - REST API: see [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)
    - Home Assistant: Settings > System > Logs
 2. Review the detailed documentation:
-   - [Authentication Guide](AUTHENTICATION.md) - **For authentication issues**
-   - [REST API README](rest-api/README.md)
+   - [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) - **For REST API / authentication issues**
    - [Home Assistant Integration README](homeassistant-integration/README.md)
 3. Verify all prerequisites are met
 4. Check the troubleshooting sections in the documentation

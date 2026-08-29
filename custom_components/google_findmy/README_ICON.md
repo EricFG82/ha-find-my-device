@@ -1,6 +1,14 @@
 # Integration Icon
 
-This directory contains the icon files for the Google Find My Device integration in Home Assistant.
+This directory contains icon source files for the Google Find My Device integration.
+
+> **⚠️ These files are NOT automatically picked up by Home Assistant.** The icon
+> shown on the Devices & Services page comes exclusively from the public
+> [home-assistant/brands](https://github.com/home-assistant/brands) repository,
+> keyed by domain - not from local files in a custom integration's folder. See
+> [`../../ICON_INSTRUCTIONS.md`](../../ICON_INSTRUCTIONS.md) for the actual process
+> (a PR to that repo). Until that PR is merged, expect "icon not available" in the
+> HA UI regardless of what's in this folder - it's cosmetic only.
 
 ## Available Files
 
@@ -11,11 +19,8 @@ This directory contains the icon files for the Google Find My Device integration
 
 ## Usage
 
-Home Assistant will automatically detect these files and display the icon in:
-
-- Integration list (Settings > Devices & Services)
-- Configuration cards
-- Integration documentation
+These are source assets for a future `home-assistant/brands` submission (see the
+warning above) - not files Home Assistant itself reads.
 
 ## Generate PNG from SVG
 
@@ -51,7 +56,8 @@ To customize the icon:
 
 1. Edit `logo.svg` with a vector editor (Inkscape, Illustrator, Figma)
 2. Regenerate the PNGs using the script or conversion tools
-3. Restart Home Assistant to see the changes
+3. Update the `home-assistant/brands` PR (see the warning at the top) with the new
+   PNGs - restarting Home Assistant alone won't show any change here
 
 ## License
 

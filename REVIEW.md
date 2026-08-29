@@ -1,6 +1,9 @@
 # Project Review & Verification
 
-## ✅ Review Status: COMPLETE AND CORRECT
+> **Note**: This is a snapshot of the initial review. For what's changed since, see
+> [CHANGELOG.md](CHANGELOG.md).
+
+## ✅ Review Status: COMPLETE AND CORRECT (as of initial delivery)
 
 This document provides a comprehensive review of the Google Find My Device - Home Assistant Integration project.
 
@@ -153,7 +156,8 @@ This document provides a comprehensive review of the Google Find My Device - Hom
 
 #### Sensor Platform (sensor.py)
 
-- ✅ Battery level sensor
+- ⚠️ Battery level sensor (code correct, but Google's network doesn't currently
+  expose battery data for these trackers, so it's never actually created in practice)
 - ✅ Last seen sensor
 - ✅ Proper state classes
 - ✅ Device classes assigned
@@ -167,7 +171,7 @@ This document provides a comprehensive review of the Google Find My Device - Hom
 - ✅ GPS source type
 - ✅ Latitude/longitude properties
 - ✅ Accuracy property
-- ✅ Battery level integration
+- ⚠️ Battery level integration (present in the code, but always `null` today - see note above)
 - ✅ Rich state attributes
 - ✅ Coordinator entity pattern
 

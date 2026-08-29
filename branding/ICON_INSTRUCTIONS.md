@@ -1,5 +1,22 @@
 # Instructions for Adding Icon to Integration
 
+> **⚠️ Correction**: Everything below describing "drop `icon.svg`/`icon.png` into
+> the integration folder and it'll show up" is **incorrect** for current Home
+> Assistant versions. Since HA introduced the brands system (~2021), the icon shown
+> on the Devices & Services / integrations list page is fetched exclusively from the
+> public **[home-assistant/brands](https://github.com/home-assistant/brands)**
+> repository, keyed by domain (`google_findmy`) - local files in
+> `custom_components/google_findmy/` are never read for that purpose. That's why
+> you'll see "icon not available" there no matter what's in this folder.
+>
+> **The only real fix**: submit `icon.png` (256×256) and optionally
+> `icon@2x.png`/`logo.png` to `custom_components/google_findmy/` in the
+> home-assistant/brands repo via a PR, and wait for it to be reviewed and merged.
+> The `logo.svg`/`icon.svg` assets in this folder are still useful source material
+> for that PR - `generate_icon.py` can render them to PNG. Until then, the
+> "icon not available" placeholder is cosmetic only and doesn't affect
+> functionality.
+
 ## Created Files
 
 I've created two SVG files for the integration:

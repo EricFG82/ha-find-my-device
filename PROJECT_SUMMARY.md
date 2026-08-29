@@ -1,5 +1,11 @@
 # Project Summary: Google Find My Device - Home Assistant Integration
 
+> **Note**: This is a snapshot of the initial delivery, from when the REST API
+> and this Home Assistant integration still lived in one repo. The API has
+> since moved to its own repo - see
+> [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api). For
+> what's changed since, see [CHANGELOG.md](CHANGELOG.md).
+
 ## Executive Summary
 
 This project provides a complete, production-ready solution for integrating Google Find My Device functionality with Home Assistant. It consists of two main components: a REST API service and a Home Assistant custom integration.
@@ -45,7 +51,9 @@ This project provides a complete, production-ready solution for integrating Goog
 **Features Implemented**:
 1. ✅ UI-based configuration (Config Flow)
 2. ✅ Device tracker entities (location on map)
-3. ✅ Battery level sensors
+3. ✅ Battery level sensors (created only if data is available - Google's network
+   doesn't currently expose battery percentage for these trackers, so this is
+   effectively unused today)
 4. ✅ Last seen timestamp sensors
 5. ✅ Automatic updates (60-second polling)
 6. ✅ Rich device attributes (type, model, accuracy, status)
@@ -131,7 +139,7 @@ This project provides a complete, production-ready solution for integrating Goog
 
 1. **Entity Types**:
    - Device Tracker (location on map)
-   - Battery Level Sensor (percentage)
+   - Battery Level Sensor (percentage) - not currently populated, see note above
    - Last Seen Sensor (timestamp)
 
 2. **Configuration**:
