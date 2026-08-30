@@ -64,7 +64,20 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 
 ### Step 2: Install the Home Assistant Integration
 
-**Not yet available via HACS** - install manually for now:
+Not yet in HACS's official default store - add it as a **custom repository**
+instead (works the same way once added):
+
+**Option A: HACS (recommended)**
+
+1. Open **HACS** in Home Assistant (install [HACS](https://hacs.xyz/) itself
+   first if you don't have it yet)
+2. Click the **⋮** menu (top right) → **Custom repositories**
+3. Add `https://github.com/EricFG82/ha-find-my-device` as the repository,
+   with category **Integration**
+4. Find **Find My Device** in HACS's integration list and click **Download**
+5. Restart Home Assistant
+
+**Option B: Manual**
 
 1. **Copy the integration to Home Assistant**:
 
@@ -79,7 +92,9 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 
    - Go to Settings > System > Restart (or `ha core restart` over SSH)
 
-3. **Add the integration**:
+**Then, either way:**
+
+1. **Add the integration**:
 
    - Go to Settings > Devices & Services
    - Click "+ ADD INTEGRATION"
@@ -87,7 +102,7 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
    - Enter your API URL (e.g., `http://192.168.1.100:8000`)
    - Click Submit
 
-4. **View your devices**:
+2. **View your devices**:
    - Go to Settings > Devices & Services > Find My Device
    - Click on the integration to see all discovered devices
    - Add device trackers to your map card

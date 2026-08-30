@@ -39,14 +39,24 @@ Expected output:
 
 ### 3. Install Home Assistant Integration (3 minutes)
 
-**Option A: Using Home Assistant File Editor Add-on**
+**Option A: HACS (Recommended)**
+
+1. Open **HACS** in Home Assistant (install [HACS](https://hacs.xyz/) itself
+   first if you don't have it yet)
+2. Click the **⋮** menu (top right) → **Custom repositories**
+3. Add `https://github.com/EricFG82/ha-find-my-device` with category
+   **Integration**
+4. Find **Find My Device** in HACS and click **Download**
+5. Skip to step 4 below (Restart Home Assistant)
+
+**Option B: Using Home Assistant File Editor Add-on**
 
 1. Install the File Editor add-on if you haven't already
 2. Navigate to `/config/custom_components/`
 3. Create a new folder called `find_my_device`
 4. Copy all files from this repo's `custom_components/find_my_device/` to this folder
 
-**Option B: Using SSH or Terminal**
+**Option C: Using SSH or Terminal**
 
 ```bash
 # SSH into your Home Assistant instance
@@ -62,7 +72,7 @@ mkdir -p custom_components
 cp -r /path/to/custom_components/find_my_device custom_components/
 ```
 
-**Option C: Using Samba/SMB Share**
+**Option D: Using Samba/SMB Share**
 
 1. Connect to your Home Assistant via network share
 2. Navigate to the `config` folder
