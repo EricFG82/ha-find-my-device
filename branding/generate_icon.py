@@ -74,30 +74,27 @@ def main():
     if not check_dependencies():
         sys.exit(1)
     
-    # Get script directory
+    # SVGs live alongside this script; PNGs go into the integration's
+    # brand/ folder (which HACS checks for locally - see branding/README.md).
     script_dir = Path(__file__).parent
-    integration_dir = script_dir / "custom_components" / "google_findmy"
-    
-    # Check if integration directory exists
-    if not integration_dir.exists():
-        print(f"❌ Integration directory not found: {integration_dir}")
-        sys.exit(1)
-    
+    brand_dir = script_dir.parent / "custom_components" / "find_my_device" / "brand"
+    brand_dir.mkdir(parents=True, exist_ok=True)
+
     # Define file paths
-    logo_svg = integration_dir / "logo.svg"
-    icon_svg = integration_dir / "icon.svg"
-    icon_png = integration_dir / "icon.png"
-    icon_2x_png = integration_dir / "icon@2x.png"
-    
+    logo_svg = script_dir / "logo.svg"
+    icon_svg = script_dir / "icon.svg"
+    icon_png = brand_dir / "icon.png"
+    icon_2x_png = brand_dir / "icon@2x.png"
+
     # Check if SVG files exist
     if not logo_svg.exists() and not icon_svg.exists():
-        print(f"❌ No SVG files found in {integration_dir}")
+        print(f"❌ No SVG files found in {script_dir}")
         sys.exit(1)
-    
+
     # Prefer logo.svg over icon.svg for static icon
     source_svg = logo_svg if logo_svg.exists() else icon_svg
-    
-    print(f"\n📂 Working directory: {integration_dir}")
+
+    print(f"\n📂 Output directory: {brand_dir}")
     print(f"📄 Source SVG: {source_svg.name}")
     print()
     
@@ -120,12 +117,9 @@ def main():
     print("✅ Icon generation complete!")
     print()
     print("Next steps:")
-    print("1. Copy the integration to Home Assistant:")
-    print(f"   cp -r {integration_dir} /config/custom_components/")
-    print()
-    print("2. Restart Home Assistant")
-    print()
-    print("3. Check Settings > Devices & Services for the new icon")
+    print("1. These PNGs satisfy HACS's own local 'brands' check - commit them.")
+    print("2. For the icon to show up in Home Assistant's own UI, submit them")
+    print("   to home-assistant/brands (see branding/README.md).")
 
 if __name__ == "__main__":
     main()
