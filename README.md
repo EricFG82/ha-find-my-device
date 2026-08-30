@@ -111,9 +111,12 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 │                                   # home-assistant/brands PR - see its README)
 ├── docs/
 │   └── example_configuration.yaml # Extra automation/card examples
-├── ARCHITECTURE.md                # Technical architecture
-├── QUICKSTART.md                  # Quick start guide
-└── README.md                      # This file
+├── .github/workflows/              # HACS validation + release-on-tag automation
+├── hacs.json                       # HACS metadata
+├── ARCHITECTURE.md                 # Technical architecture
+├── QUICKSTART.md                   # Quick start guide
+├── RELEASING.md                    # How releases/HACS versioning work
+└── README.md                       # This file
 ```
 
 ## 🔧 Configuration
@@ -333,6 +336,7 @@ Integration added successfully but no entities appear:
 
 - [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) - REST API service (setup, authentication, endpoint reference)
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Technical architecture
+- [RELEASING.md](RELEASING.md) - How releases/HACS versioning work
 - [GoogleFindMyTools](https://github.com/leonboe1/GoogleFindMyTools) - Underlying library used by the REST API
 
 ## 🔒 Security Considerations

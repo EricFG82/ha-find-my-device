@@ -1,0 +1,67 @@
+name: Create GitHub Release
+
+# HACS tracks versions via GitHub Releases, not git tags directly - this
+# turns a version tag push into a Release automatically, so cutting a
+# release is just "bump manifest.json's version, tag, push" (see
+# RELEASING.md). Also verifies the tag actually matches manifest.json's
+# version first, since HACS expects those to agree.
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify tag matches manifest.json version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          MANIFEST_VERSION=$(jq -r '.version' custom_components/find_my_device/manifest.json)
+          if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match manifest.json version ${MANIFEST_VERSION} - HACS expects these to match. Bump manifest.json's version, commit, and re-tag."
+            exit 1
+          fi
+
+      - name: Extract CHANGELOG section for this version
+        id: notes
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          NOTES=$(awk -v ver="## [$TAG_VERSION]" '
+            $0 ~ "^" ver { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md)
+          if [ -z "$NOTES" ]; then
+            echo "has_notes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_notes=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "notes<<EOF"
+              echo "$NOTES"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release (with CHANGELOG notes)
+        if: steps.notes.outputs.has_notes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes "${{ steps.notes.outputs.notes }}"
+
+      - name: Create release (auto-generated notes)
+        if: steps.notes.outputs.has_notes != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes
