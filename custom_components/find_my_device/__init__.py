@@ -140,12 +140,18 @@ class GoogleFindMyAPIClient:
             _LOGGER.error("Error fetching devices: %s", err)
             raise UpdateFailed(f"Error fetching devices: {err}") from err
     
-    async def get_device_detail(self, device_id: str) -> dict:
-        """Get detailed information for a specific device."""
+    async def get_device_detail(self, device_id: str, force: bool = False) -> dict:
+        """Get detailed information for a specific device.
+
+        `force` requests a fresh location from Google instead of the API's own
+        cache (can take up to ~30s) - only meant for an explicit, user-triggered
+        "locate now" action, not routine polling.
+        """
         try:
-            async with async_timeout.timeout(30):
+            async with async_timeout.timeout(35):
                 async with self.session.get(
-                    f"{self.api_url}/api/v1/devices/{device_id}"
+                    f"{self.api_url}/api/v1/devices/{device_id}",
+                    params={"force": "true"} if force else None,
                 ) as response:
                     response.raise_for_status()
                     return await response.json()
@@ -214,4 +220,17 @@ class GoogleFindMyDataUpdateCoordinator(DataUpdateCoordinator):
         except Exception as err:
             _LOGGER.error("Error communicating with API: %s", err)
             raise UpdateFailed(f"Error communicating with API: {err}") from err
+
+    async def async_locate_device(self, device_id: str) -> None:
+        """Force a fresh location fetch for a single device (the "Locate" button).
+
+        Fetches just this one device with `force=True` and merges the result into
+        `self.data` directly, instead of going through `async_refresh()` - that
+        would re-fetch every device and reset the poll-interval timer, which is
+        exactly the system-wide slowdown a single explicit "locate now" action
+        shouldn't cause.
+        """
+        detail = await self.api_client.get_device_detail(device_id, force=True)
+        self.data[device_id] = detail
+        self.async_update_listeners()
 

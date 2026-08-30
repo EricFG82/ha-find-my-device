@@ -213,9 +213,18 @@ something.
 | Device Tracker | `device_tracker.{device_name}`    | Once the device has a location             |
 | Sensor         | `sensor.{device_name}_battery`    | Once `battery_level` is available (never today, see note above) |
 | Sensor         | `sensor.{device_name}_last_seen`  | Immediately for every known device         |
+| Button         | `button.{device_name}_locate`     | Immediately for every known device         |
 
 The device tracker's attributes include Device ID, Device Type, Model,
 Battery Level, Location Accuracy, Location Timestamp, and Status.
+
+The **Locate** button requests a fresh location straight from Google instead
+of waiting for the next background poll - useful for a device that's out of
+range of your phone, where the regular update cycle can otherwise take a
+while to catch up. It only re-fetches that one device, so it won't slow down
+polling for the rest of them, but each press can take up to ~30 seconds and
+still counts as a request against Google's API - press it when you actually
+need a location right now, not as part of an automation that runs often.
 
 ## 💡 Usage Examples
 

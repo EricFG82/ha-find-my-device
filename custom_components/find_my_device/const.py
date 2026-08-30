@@ -6,7 +6,7 @@ from homeassistant.const import Platform
 DOMAIN = "find_my_device"
 
 # Platforms
-PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER]
+PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER, Platform.BUTTON]
 
 # Configuration
 CONF_API_URL = "api_url"

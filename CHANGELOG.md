@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-08-30
+
+### Added
+
+- A **Locate** button entity per device (`button.{device_name}_locate`) that
+  requests a fresh location on demand, bypassing the background poll's
+  cache (needs `find-my-device-rest-api` v1.2.4+, which added
+  `?force=true` support to `GET /api/v1/devices/{device_id}`). It only
+  re-fetches the one device pressed, so it doesn't affect polling for the
+  rest - useful for a device currently out of range of your phone, where
+  the regular update cycle can otherwise take a while to catch up.
+
 ## [1.2.0] - 2026-08-29
 
 ### Added
