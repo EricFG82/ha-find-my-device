@@ -1,9 +1,9 @@
-"""Constants for the Google Find My Device integration."""
+"""Constants for the Find My Device integration."""
 
 from homeassistant.const import Platform
 
 # Domain
-DOMAIN = "google_find_my_device"
+DOMAIN = "find_my_device"
 
 # Platforms
 PLATFORMS = [Platform.SENSOR, Platform.DEVICE_TRACKER]

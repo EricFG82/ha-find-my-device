@@ -1,9 +1,9 @@
-# Google Find My Device - Home Assistant Integration
+# Find My Device - Home Assistant Integration
 
-A custom Home Assistant integration for Google Find My Device tracking.
+A custom Home Assistant integration for Find My Device tracking.
 
 > This repo holds the **Home Assistant integration**. It talks over HTTP to a
-> separate REST API service - **[google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)**
+> separate REST API service - **[find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api)**
 > (which wraps the GoogleFindMyTools library and handles Google authentication)
 > - you'll need that running first. The two used to live in one repo; they were
 > split so each can be versioned/released independently, and so this
@@ -32,8 +32,8 @@ A custom Home Assistant integration for Google Find My Device tracking.
 ## 🎯 Project Overview
 
 This is a custom Home Assistant component that connects to the
-[google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) REST API to
-provide Google Find My Device tracking and monitoring in Home Assistant.
+[find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) REST API to
+provide Find My Device tracking and monitoring in Home Assistant.
 
 ## ✨ Features
 
@@ -48,7 +48,7 @@ provide Google Find My Device tracking and monitoring in Home Assistant.
 
 ## 📋 Prerequisites
 
-- The [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) REST
+- The [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) REST
   API service running and reachable from Home Assistant (see its own Quick
   Start - Docker, in-browser authentication, no local Chrome needed)
 - **Home Assistant** (version 2023.1 or newer)
@@ -57,7 +57,7 @@ provide Google Find My Device tracking and monitoring in Home Assistant.
 
 ### Step 1: Get the REST API Running
 
-This integration needs [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)
+This integration needs [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api)
 running somewhere reachable from Home Assistant. Follow its own Quick Start,
 then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 `{"status":"healthy",...}`.
@@ -72,7 +72,7 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
    # SSH into your Home Assistant instance or use the File Editor add-on
    cd /config
    mkdir -p custom_components
-   cp -r /path/to/custom_components/google_find_my_device custom_components/
+   cp -r /path/to/custom_components/find_my_device custom_components/
    ```
 
 2. **Restart Home Assistant**:
@@ -83,12 +83,12 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 
    - Go to Settings > Devices & Services
    - Click "+ ADD INTEGRATION"
-   - Search for "Google Find My Device"
+   - Search for "Find My Device"
    - Enter your API URL (e.g., `http://192.168.1.100:8000`)
    - Click Submit
 
 4. **View your devices**:
-   - Go to Settings > Devices & Services > Google Find My Device
+   - Go to Settings > Devices & Services > Find My Device
    - Click on the integration to see all discovered devices
    - Add device trackers to your map card
 
@@ -97,7 +97,7 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 ```
 .
 ├── custom_components/
-│   └── google_find_my_device/
+│   └── find_my_device/
 │       ├── __init__.py            # Integration setup
 │       ├── config_flow.py         # UI configuration
 │       ├── const.py               # Constants
@@ -120,9 +120,9 @@ then come back here once `curl http://YOUR_API_HOST:8000/health` returns
 
 Configuration is done through the UI:
 
-- **API URL**: The URL where your [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) service is running
+- **API URL**: The URL where your [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) service is running
 - **Update Interval**: Default is 60 seconds; to change it, edit
-  `custom_components/google_find_my_device/const.py`:
+  `custom_components/find_my_device/const.py`:
 
   ```python
   DEFAULT_SCAN_INTERVAL = 120  # Change to desired seconds
@@ -142,7 +142,7 @@ services:
     networks:
       - findmy-network
 
-  google-find-my-device-rest-api:
+  find-my-device-rest-api:
     # ... API config
     networks:
       - findmy-network
@@ -152,7 +152,7 @@ networks:
     driver: bridge
 ```
 
-Use API URL: `http://google-find-my-device-rest-api:8000`
+Use API URL: `http://find-my-device-rest-api:8000`
 
 **Option 2: Host network**
 
@@ -277,16 +277,16 @@ for device in devices:
         print(f"{detail['name']}: {detail['location']['latitude']}, {detail['location']['longitude']}")
 ```
 
-See [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) for the
+See [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) for the
 full endpoint reference.
 
 ## 🐛 Troubleshooting
 
 ### Integration Not Found
 
-Can't find "Google Find My Device" when adding the integration:
+Can't find "Find My Device" when adding the integration:
 
-1. Verify the files are in the correct location: `/config/custom_components/google_find_my_device/`
+1. Verify the files are in the correct location: `/config/custom_components/find_my_device/`
 2. Restart Home Assistant
 3. Clear browser cache (Ctrl+F5)
 
@@ -305,7 +305,7 @@ Integration added successfully but no entities appear:
 
 1. Check the integration logs: Settings > System > Logs
 2. Verify the REST API service has devices: `curl http://YOUR_API_HOST:8000/api/v1/devices`
-3. Reload the integration: Settings > Devices & Services > Google Find My Device > ⋮ > Reload
+3. Reload the integration: Settings > Devices & Services > Find My Device > ⋮ > Reload
 
 ### Entities Unavailable
 
@@ -324,14 +324,14 @@ Integration added successfully but no entities appear:
 ## 🗑️ Uninstallation
 
 1. Go to **Settings** > **Devices & Services**
-2. Find **Google Find My Device**
+2. Find **Find My Device**
 3. Click the **⋮** menu → **Delete**
-4. Optionally, remove the integration files: `rm -rf /config/custom_components/google_find_my_device`
+4. Optionally, remove the integration files: `rm -rf /config/custom_components/find_my_device`
 5. Restart Home Assistant
 
 ## 📚 Documentation
 
-- [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) - REST API service (setup, authentication, endpoint reference)
+- [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) - REST API service (setup, authentication, endpoint reference)
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Technical architecture
 - [GoogleFindMyTools](https://github.com/leonboe1/GoogleFindMyTools) - Underlying library used by the REST API
 
@@ -390,12 +390,12 @@ the rest of the project (MIT - see below).
 **MIT** - see [LICENSE](LICENSE) for the full text.
 
 This integration talks to the REST API over plain HTTP - it doesn't import or
-link any of its code, so unlike [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)
+link any of its code, so unlike [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api)
 (GPL-3.0, since it imports GoogleFindMyTools directly), this repo isn't bound
 by GPL-3.0's "combined work" rules and can use a permissive license instead.
 
 ## 🙏 Credits
 
-- [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) - The REST API service this integration talks to
+- [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) - The REST API service this integration talks to
 - [GoogleFindMyTools](https://github.com/leonboe1/GoogleFindMyTools) by leonboe1 - The underlying library that makes this possible
 - [Home Assistant](https://www.home-assistant.io/) - Open source home automation platform

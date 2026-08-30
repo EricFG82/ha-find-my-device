@@ -1,0 +1,13 @@
+{
+  "domain": "find_my_device",
+  "name": "Find My Device",
+  "codeowners": ["@EricFG82"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/EricFG82/ha-find-my-device",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/EricFG82/ha-find-my-device/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}
+

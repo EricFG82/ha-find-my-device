@@ -102,7 +102,7 @@ class GoogleFindMyDeviceTracker(CoordinatorEntity, TrackerEntity):
         return DeviceInfo(
             identifiers={(DOMAIN, self._device_id)},
             name=self._device_name,
-            manufacturer="Google Find My Device",
+            manufacturer="Find My Device",
             model=self._model or self._device_type,
         )
     

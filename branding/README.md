@@ -1,20 +1,20 @@
 # Branding
 
-Icon source assets for the `google_find_my_device` integration.
+Icon source assets for the `find_my_device` integration.
 
 ## Why these files aren't enough on their own
 
 Since Home Assistant introduced the brands system (~2021), the icon shown on
 the Devices & Services / integrations list page is fetched exclusively from
 the public **[home-assistant/brands](https://github.com/home-assistant/brands)**
-repository, keyed by domain (`google_find_my_device`) - files in
-`custom_components/google_find_my_device/` are never read for that purpose, and
+repository, keyed by domain (`find_my_device`) - files in
+`custom_components/find_my_device/` are never read for that purpose, and
 neither are the files in this folder. Until a PR there is merged, expect
 "icon not available" in the HA UI regardless of what's here - it's cosmetic
 only and doesn't affect functionality.
 
 **The actual fix**: submit `icon.png` (256×256) and optionally
-`icon@2x.png` (512×512) / `logo.png` to `custom_integrations/google_find_my_device/`
+`icon@2x.png` (512×512) / `logo.png` to `custom_integrations/find_my_device/`
 in the home-assistant/brands repo via a PR (see their `CONTRIBUTING.md` for
 the exact submission format), and wait for it to be reviewed and merged.
 

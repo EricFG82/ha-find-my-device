@@ -1,11 +1,11 @@
 # Quick Start Guide
 
-Get up and running with Google Find My Device integration in Home Assistant in under 10 minutes!
+Get up and running with Find My Device integration in Home Assistant in under 10 minutes!
 
 ## Prerequisites Checklist
 
 - [ ] Google Account with Find My Device enabled
-- [ ] The [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) REST API service running somewhere reachable from Home Assistant
+- [ ] The [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) REST API service running somewhere reachable from Home Assistant
 - [ ] Home Assistant running (version 2023.1+)
 
 ## Step-by-Step Setup
@@ -14,7 +14,7 @@ Get up and running with Google Find My Device integration in Home Assistant in u
 
 ```bash
 git clone <repository-url>
-cd ha_google_find_my_device
+cd ha-find-my-device
 ```
 
 Or download and extract the ZIP file.
@@ -23,7 +23,7 @@ Or download and extract the ZIP file.
 
 This integration is just the Home Assistant side - it needs the REST API
 service running somewhere it can reach over the network. Follow
-[google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)'s own
+[find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api)'s own
 Quick Start (Docker, authenticate via the in-browser VNC flow - no local
 Chrome needed) to get it up, then come back here. Once it's running:
 
@@ -43,8 +43,8 @@ Expected output:
 
 1. Install the File Editor add-on if you haven't already
 2. Navigate to `/config/custom_components/`
-3. Create a new folder called `google_find_my_device`
-4. Copy all files from this repo's `custom_components/google_find_my_device/` to this folder
+3. Create a new folder called `find_my_device`
+4. Copy all files from this repo's `custom_components/find_my_device/` to this folder
 
 **Option B: Using SSH or Terminal**
 
@@ -59,7 +59,7 @@ cd /config
 mkdir -p custom_components
 
 # Copy the integration (adjust path as needed)
-cp -r /path/to/custom_components/google_find_my_device custom_components/
+cp -r /path/to/custom_components/find_my_device custom_components/
 ```
 
 **Option C: Using Samba/SMB Share**
@@ -67,7 +67,7 @@ cp -r /path/to/custom_components/google_find_my_device custom_components/
 1. Connect to your Home Assistant via network share
 2. Navigate to the `config` folder
 3. Create `custom_components` folder if it doesn't exist
-4. Copy the `google_find_my_device` folder into `custom_components`
+4. Copy the `find_my_device` folder into `custom_components`
 
 ### 4. Restart Home Assistant (1 minute)
 
@@ -78,10 +78,10 @@ cp -r /path/to/custom_components/google_find_my_device custom_components/
 
 1. Go to **Settings** > **Devices & Services**
 2. Click **+ ADD INTEGRATION** (bottom right)
-3. Search for **"Google Find My Device"**
+3. Search for **"Find My Device"**
 4. Click on it
 5. Enter the configuration:
-   - **Name**: `Google Find My Device` (or any name you prefer)
+   - **Name**: `Find My Device` (or any name you prefer)
    - **API URL**:
      - If Home Assistant and API are on the same machine: `http://localhost:8000`
      - If on different machines: `http://YOUR_API_SERVER_IP:8000`
@@ -90,7 +90,7 @@ cp -r /path/to/custom_components/google_find_my_device custom_components/
 
 ### 6. Verify Everything Works
 
-1. Go to **Settings** > **Devices & Services** > **Google Find My Device**
+1. Go to **Settings** > **Devices & Services** > **Find My Device**
 2. You should see your devices listed
 3. Click on a device to see its entities:
    - `device_tracker.{device_name}` - Location tracker (appears once the device has a location)
@@ -132,8 +132,8 @@ cp -r /path/to/custom_components/google_find_my_device custom_components/
 ## Common Issues and Quick Fixes
 
 > 📖 **For REST API / authentication issues**, see
-> [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)'s
-> [AUTHENTICATION.md](https://github.com/EricFG82/google-find-my-device-rest-api/blob/main/AUTHENTICATION.md)
+> [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api)'s
+> [AUTHENTICATION.md](https://github.com/EricFG82/find-my-device-rest-api/blob/main/AUTHENTICATION.md)
 
 ### Issue: "Cannot connect to API"
 
@@ -152,7 +152,7 @@ curl http://YOUR_API_HOST:8000/health
 
 **Fix:**
 
-1. Verify files are in `/config/custom_components/google_find_my_device/`
+1. Verify files are in `/config/custom_components/find_my_device/`
 2. Check file permissions
 3. Restart Home Assistant
 4. Clear browser cache (Ctrl+F5)
@@ -167,10 +167,10 @@ curl http://YOUR_API_HOST:8000/health
 curl http://YOUR_API_URL/health
 
 # Check integration logs in Home Assistant
-# Settings > System > Logs > Filter for "google_find_my_device"
+# Settings > System > Logs > Filter for "find_my_device"
 
 # Reload the integration
-# Settings > Devices & Services > Google Find My Device > ⋮ > Reload
+# Settings > Devices & Services > Find My Device > ⋮ > Reload
 ```
 
 ## Next Steps
@@ -189,16 +189,16 @@ See the main [README.md](README.md) for examples and advanced configuration.
 If you encounter issues:
 
 1. Check the logs:
-   - REST API: see [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)
+   - REST API: see [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api)
    - Home Assistant: Settings > System > Logs
 2. Review the detailed documentation:
-   - [google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) - **For REST API / authentication issues**
+   - [find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) - **For REST API / authentication issues**
    - [README.md](README.md#-troubleshooting)
 3. Verify all prerequisites are met
 4. Check the troubleshooting sections in the documentation
 
 ## Success! 🎉
 
-You now have Google Find My Device integrated with Home Assistant! Your devices should appear on the map and you can track their location, battery level, and status.
+You now have Find My Device integrated with Home Assistant! Your devices should appear on the map and you can track their location, battery level, and status.
 
 Enjoy your new device tracking capabilities!

@@ -1,12 +1,12 @@
 # Architecture Documentation
 
-This document describes the architecture and design decisions for the Google Find My Device Home Assistant integration.
+This document describes the architecture and design decisions for the Find My Device Home Assistant integration.
 
 ## Overview
 
 This repo holds the **Home Assistant custom integration**. It's one half of a
 two-repo project: the integration talks over HTTP to a separate
-**[google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api)**
+**[find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api)**
 REST API service (which wraps the GoogleFindMyTools library) - that service's
 own architecture, including its in-browser VNC authentication subsystem, is
 documented in its own repo.
@@ -15,7 +15,7 @@ documented in its own repo.
 ┌─────────────────────────────────────────────────────────────┐
 │                     Home Assistant                          │
 │  ┌───────────────────────────────────────────────────────┐  │
-│  │         Google Find My Device Integration            │  │
+│  │         Find My Device Integration            │  │
 │  │  ┌──────────────┐  ┌──────────────┐  ┌────────────┐ │  │
 │  │  │ Config Flow  │  │   Sensors    │  │  Trackers  │ │  │
 │  │  └──────────────┘  └──────────────┘  └────────────┘ │  │
@@ -36,7 +36,7 @@ documented in its own repo.
                     └────────────────────┘
 ```
 
-Repo: github.com/EricFG82/google-find-my-device-rest-api
+Repo: github.com/EricFG82/find-my-device-rest-api
 
 ## Component Details
 
@@ -138,7 +138,7 @@ Home Assistant State Machine
 This integration is an HTTP client of the REST API - it doesn't import any of
 its code, just calls these two endpoints. Full endpoint reference (including
 `/health` and the authentication endpoints) lives in
-[google-find-my-device-rest-api's ARCHITECTURE](https://github.com/EricFG82/google-find-my-device-rest-api)
+[find-my-device-rest-api's ARCHITECTURE](https://github.com/EricFG82/find-my-device-rest-api)
 docs.
 
 ### REST API Endpoints Used
@@ -221,7 +221,7 @@ percentage for these trackers in the reverse-engineered protocol the API uses.
 ## Deployment Options
 
 ### Option 1: Manual copy into `custom_components/` (current)
-- Copy this repo's `custom_components/google_find_my_device/` into
+- Copy this repo's `custom_components/find_my_device/` into
   Home Assistant's config directory, restart, add via the UI
 
 ### Option 2: HACS (planned)
@@ -269,5 +269,5 @@ percentage for these trackers in the reverse-engineered protocol the API uses.
 
 See [README.md](README.md#-troubleshooting)
 for integration-specific troubleshooting, or
-[google-find-my-device-rest-api](https://github.com/EricFG82/google-find-my-device-rest-api) for
+[find-my-device-rest-api](https://github.com/EricFG82/find-my-device-rest-api) for
 REST API / authentication issues.

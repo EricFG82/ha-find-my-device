@@ -22,8 +22,8 @@ SOFTWARE.
 
 ---
 
-This integration talks to the Google Find My Device REST API
-(https://github.com/EricFG82/google-findmy-api, GPL-3.0) over plain HTTP - it
-does not link or import that code, so no GPL obligation carries over to this
-repo. It also integrates with Home Assistant (https://www.home-assistant.io/,
-Apache License 2.0).
+This integration talks to the Find My Device REST API
+(https://github.com/EricFG82/find-my-device-rest-api, GPL-3.0) over
+plain HTTP - it does not link or import that code, so no GPL obligation
+carries over to this repo. It also integrates with Home Assistant
+(https://www.home-assistant.io/, Apache License 2.0).

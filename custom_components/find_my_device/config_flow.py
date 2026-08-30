@@ -19,7 +19,7 @@ _LOGGER = logging.getLogger(__name__)
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_NAME, default="Google Find My Device"): str,
+        vol.Required(CONF_NAME, default="Find My Device"): str,
         vol.Required(CONF_API_URL, default=DEFAULT_API_URL): str,
     }
 )
@@ -38,7 +38,7 @@ async def validate_api_connection(hass: HomeAssistant, api_url: str) -> dict[str
                 if data.get("status") != "healthy":
                     raise ConnectionError("API is not healthy")
                 
-                return {"title": "Google Find My Device"}
+                return {"title": "Find My Device"}
                 
     except aiohttp.ClientError as err:
         _LOGGER.error("Connection error: %s", err)

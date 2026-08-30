@@ -67,7 +67,7 @@ def generate_png_from_svg(svg_path: Path, png_path: Path, size: int = 256):
 
 def main():
     """Main function to generate icon files."""
-    print("🎨 Google Find My Device - Icon Generator")
+    print("🎨 Find My Device - Icon Generator")
     print("=" * 50)
     
     # Check dependencies
