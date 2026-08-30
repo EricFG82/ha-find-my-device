@@ -19,11 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-This integration talks to the Find My Device REST API
-(https://github.com/EricFG82/find-my-device-rest-api, GPL-3.0) over
-plain HTTP - it does not link or import that code, so no GPL obligation
-carries over to this repo. It also integrates with Home Assistant
-(https://www.home-assistant.io/, Apache License 2.0).
